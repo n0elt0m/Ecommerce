@@ -113,8 +113,44 @@ func BuyItemFromCart(ctx context.Context, userCollection *mongo.Collection, user
 	}
 	userCartEmpty := make([]models.ProductUser, 0)
 	filter3 := bson.D{primitive.E{Key: "_id", Value: id}}
+	update3 := bson.D{{Key: "$set", Value: bson.D{primitive.E{Key: "usercart", Value: userCartEmpty}}}}
+	_, err = userCollection.UpdateOne(ctx, filter3, update3)
+	if err != nil {
+		return ErrCantBuyCartItem
+	}
+	return nil
 }
 
-func InstantBuy() {
+func InstantBuy(ctx context.Context, prodCollection, userCollection *mongo.Collection, productId primitive.ObjectID, userId string) error {
+	id, err := primitive.ObjectIDFromHex(userId)
+	if err != nil {
+		log.Println(err)
+		return ErrUserIdIsNotValid
+	}
+	var productDetails models.ProductUser
+	var ordersDetail models.Order
+	ordersDetail.Order_ID = primitive.NewObjectID()
+	ordersDetail.Orderered_At = time.Now()
+	ordersDetail.Order_Cart = make([]models.ProductUser, 0)
+	ordersDetail.Payment_Method.COD = true
+	err = prodCollection.FindOne(ctx, bson.D{primitive.E{Key: "_id", Value: productId}}).Decode(&productDetails)
+	if err != nil {
+		log.Println(err)
+	}
+	ordersDetail.Price = productDetails.Price
 
+	filter := bson.D{primitive.E{Key: "_id", Value: id}}
+	update := bson.D{{Key: "$push", Value: bson.D{primitive.E{Key: "orders", Value: ordersDetail}}}}
+	_, err = userCollection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		log.Println(err)
+	}
+
+	filter2 := bson.D{primitive.E{Key: "_id", Value: id}}
+	update2 := bson.M{"$push": bson.M{"orders.$[].order_list": productDetails}}
+	_, err = userCollection.UpdateOne(ctx, filter2, update2)
+	if err != nil {
+		log.Println(err)
+	}
+	return nil
 }
