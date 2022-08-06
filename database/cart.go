@@ -84,6 +84,35 @@ func BuyItemFromCart(ctx context.Context, userCollection *mongo.Collection, user
 	if err != nil {
 		panic(err)
 	}
+	var getUserCart []bson.M
+	if err = currentResults.All(ctx, &getUserCart); err != nil {
+		panic(err)
+	}
+	var totalPrice int32
+	for _, userItem := range getUserCart {
+		price := userItem["total"]
+		totalPrice = price.(int32)
+	}
+	ordercart.Price = int(totalPrice)
+
+	filter := bson.D{primitive.E{Key: "_id", Value: id}}
+	update := bson.D{{Key: "$push", Value: bson.D{primitive.E{Key: "orders", Value: ordercart}}}}
+	_, err = userCollection.UpdateMany(ctx, filter, update)
+	if err != nil {
+		log.Println(err)
+	}
+	err = userCollection.FindOne(ctx, bson.D{primitive.E{Key: "_id", Value: id}}).Decode(&getcartitems)
+	if err != nil {
+		log.Println(err)
+	}
+	filter2 := bson.D{primitive.E{Key: "_id", Value: id}}
+	update2 := bson.M{"$push": bson.M{"orders.$[].order_list": bson.M{"$each": getcartitems.UserCart}}}
+	_, err = userCollection.UpdateOne(ctx, filter2, update2)
+	if err != nil {
+		log.Println(err)
+	}
+	userCartEmpty := make([]models.ProductUser, 0)
+	filter3 := bson.D{primitive.E{Key: "_id", Value: id}}
 }
 
 func InstantBuy() {
