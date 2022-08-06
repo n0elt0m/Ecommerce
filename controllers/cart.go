@@ -133,6 +133,7 @@ func GetItemFromCart() gin.HandlerFunc {
 	}
 }
 
+/
 func (app *Application) BuyFromCart() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userQueryID := c.Query("id")
