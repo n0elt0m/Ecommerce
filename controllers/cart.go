@@ -133,7 +133,7 @@ func GetItemFromCart() gin.HandlerFunc {
 	}
 }
 
-//
+//This is a trial
 
 func (app *Application) BuyFromCart() gin.HandlerFunc {
 	return func(c *gin.Context) {
