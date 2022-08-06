@@ -133,9 +133,6 @@ func GetItemFromCart() gin.HandlerFunc {
 	}
 }
 
-//This is a trial period of github push
-//hello from github
-
 func (app *Application) BuyFromCart() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userQueryID := c.Query("id")
