@@ -133,7 +133,7 @@ func GetItemFromCart() gin.HandlerFunc {
 	}
 }
 
-//This is a trial period of git
+//This is a trial period of gitasdfafd
 
 func (app *Application) BuyFromCart() gin.HandlerFunc {
 	return func(c *gin.Context) {
