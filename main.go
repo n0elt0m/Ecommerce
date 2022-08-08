@@ -13,7 +13,7 @@ import (
 func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080"
+		port = "9000"
 	}
 
 	app := controllers.NewApplication(database.ProductData(database.Client, "Products"), database.UserData(database.Client, "Users"))
@@ -25,6 +25,11 @@ func main() {
 
 	router.GET("/addtocart", app.AddToCart())
 	router.GET("/removeitem", app.RemoveItem())
+	router.GET("/listcart", controllers.GetItemFromCart())
+	router.POST("/addaddress", controllers.AddAddress())
+	router.PUT("/edithomeaddress", controllers.EditHomeAddress())
+	router.PUT("/editworkaddress", controllers.EditWrorkAddress())
+	router.GET("/deleteaddresses", controllers.DeleteAddress())
 	router.GET("/cartcheckout", app.BuyFromCart())
 	router.GET("/instantbuy", app.InstantBuy())
 
