@@ -9,7 +9,24 @@ import (
 )
 
 func DBSet() *mongo.Client {
-	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb+srv://mongo5m0k13:eknmgptctkpr@cluster0.u1esg.mongodb.net/?retryWrites=true&w=majority"))
+
+	//serverAPIOptions := options.ServerAPI(options.ServerAPIVersion1)
+	//clientOptions := options.Client().ApplyURI("mongodb+srv://mongo5m0k13:<password>@cluster0.u1esg.mongodb.net/?retryWrites=true&w=majority").SetServerAPIOptions(serverAPIOptions)
+	//ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	//defer cancel()
+	//client, err := mongo.Connect(ctx, clientOptions)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//mongodb: //mongodb:27017
+	//client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://development:testpassword@localhost:27017"))
+
+	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb+srv://mongo5m0k13:eknmgptctkpr@cluster0.npyvkdk.mongodb.net/?retryWrites=true&w=majority"))
+
+	//
+	//client, err := mongo.NewClient(options.Client().ApplyURI("mongodb+srv://mongo5m0k13:eknmgptctkpr@cluster0.u1esg.mongodb.net/?retryWrites=true&w=majority").SetServerAPIOptions(serverAPIOptions))
+
+	//client, err := mongo.NewClient(options.Client().ApplyURI("mongodb+srv://mongo5m0k13:eknmgptctkpr@cluster0.u1esg.mongodb.net/?retryWrites=true&w=majority"))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -17,14 +34,16 @@ func DBSet() *mongo.Client {
 	defer cancel()
 	err = client.Connect(ctx)
 	if err != nil {
+		log.Println("!!!failed to connect to mongodb!!!!!!!")
 		log.Fatal(err)
 	}
+
 	err = client.Ping(context.TODO(), nil)
 	if err != nil {
-		log.Println("Failed to connect to mongoDB :(")
+		log.Println("failed to connect to mongodb!!!!!!!")
 		return nil
 	}
-	println("DB Connection Successfull")
+	println("Successfully Connected to the mongodb")
 	return client
 }
 
