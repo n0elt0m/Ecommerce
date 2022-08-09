@@ -156,6 +156,7 @@ Cart Checkout Function and placing the order(GET REQUEST)
 
 After placing the order the items have to be deleted from cart
 
-http://localhost:9000?id=xxuser_idxxx
+http://localhost:9000/cartcheckout?id=xxuser_idxxx
 
-Instantly Buying the Products(GET REQUEST) http://localhost:9000?userid=xxuser_idxxx&pid=xxxxproduct_idxxxx
+Instantly Buying the Products(GET REQUEST) 
+http://localhost:9000/instantbuy?userid=xxuser_idxxx&pid=xxxxproduct_idxxxx
