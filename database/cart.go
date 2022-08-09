@@ -22,24 +22,26 @@ var (
 )
 
 func AddProductToCart(ctx context.Context, prodCollection, userCollection *mongo.Collection, productId primitive.ObjectID, userId string) error {
-	searchFromDb, err := prodCollection.Find(ctx, bson.M{"_id": productId})
+	searchfromdb, err := prodCollection.Find(ctx, bson.M{"_id": productId})
 	if err != nil {
 		log.Println(err)
 		return ErrCantFindProduct
 	}
-	var productCart []models.ProductUser
-	err = searchFromDb.All(ctx, &productCart)
+	var productcart []models.ProductUser
+	err = searchfromdb.All(ctx, &productcart)
 	if err != nil {
 		log.Println(err)
 		return ErrCantDecodeProduct
 	}
+
 	id, err := primitive.ObjectIDFromHex(userId)
 	if err != nil {
 		log.Println(err)
 		return ErrUserIdIsNotValid
 	}
+
 	filter := bson.D{primitive.E{Key: "_id", Value: id}}
-	update := bson.D{{Key: "$push", Value: bson.D{primitive.E{Key: "usercart", Value: bson.D{{Key: "$each", Value: productCart}}}}}}
+	update := bson.D{{Key: "$push", Value: bson.D{primitive.E{Key: "usercart", Value: bson.D{{Key: "$each", Value: productcart}}}}}}
 	_, err = userCollection.UpdateOne(ctx, filter, update)
 	if err != nil {
 		return ErrCantUpdateUser
