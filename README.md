@@ -65,7 +65,7 @@ Response
   },
   {
     "Product_ID": "616152679f29be942bd9df8f",
-    "product_name": "giner ale",
+    "product_name": "ginger ale",
     "price": 900,
     "rating": 5,
     "image": "gin.jpg"
@@ -75,7 +75,7 @@ Response
     "product_name": "iphone 13",
     "price": 1700,
     "rating": 4,
-    "image": "ipho.jpg"
+    "image": "iphone.jpg"
   },
   {
     "Product_ID": "616152fa9f29be942bd9df91",

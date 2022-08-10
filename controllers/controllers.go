@@ -54,8 +54,11 @@ func Signup() gin.HandlerFunc {
 		validationErr := Validate.Struct(user)
 		if validationErr != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": validationErr})
+			println("Validation Error")
 			return
 		}
+
+		//check Email
 		count, err := UserCollection.CountDocuments(ctx, bson.M{"email": user.Email})
 		if err != nil {
 			log.Panic(err)
@@ -63,9 +66,10 @@ func Signup() gin.HandlerFunc {
 			return
 		}
 		if count > 0 {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "user already exists"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "email already exists"})
 			return
 		}
+		//Check Phone
 		count, err = UserCollection.CountDocuments(ctx, bson.M{"phone": user.Phone})
 		defer cancel()
 		if err != nil {
@@ -77,6 +81,8 @@ func Signup() gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "this phone number is already used"})
 			return
 		}
+
+		//defining struct
 		password := HashPassword(*user.Password)
 		user.Password = &password
 
@@ -92,6 +98,8 @@ func Signup() gin.HandlerFunc {
 		user.UserCart = make([]models.ProductUser, 0)
 		user.Address_Details = make([]models.Address, 0)
 		user.Order_Status = make([]models.Order, 0)
+
+		//DB adding
 		_, inserterr := UserCollection.InsertOne(ctx, user)
 		if inserterr != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "The user was not created"})
@@ -106,12 +114,17 @@ func Login() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 		defer cancel()
+
 		var user models.User
+
 		var founduser models.User
+
 		if err := c.BindJSON(&user); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err})
 			return
 		}
+
+		//DB Search
 		err := UserCollection.FindOne(ctx, bson.M{"email": user.Email}).Decode(&founduser)
 		defer cancel()
 		if err != nil {
@@ -125,6 +138,8 @@ func Login() gin.HandlerFunc {
 			fmt.Println(msg)
 			return
 		}
+
+		//jwt
 		token, refreshToken, _ := generate.TokenGenerator(*founduser.Email, *founduser.First_Name, *founduser.Last_Name, founduser.User_ID)
 		defer cancel()
 		generate.UpdateAllTokens(token, refreshToken, founduser.User_ID)
@@ -161,6 +176,8 @@ func SearchProduct() gin.HandlerFunc {
 			c.IndentedJSON(http.StatusInternalServerError, "Something went wrong please try after some time")
 			return
 		}
+
+		//json->struct
 		err = cursor.All(ctx, &productList)
 		if err != nil {
 			log.Println(err)
@@ -197,6 +214,8 @@ func SearchProductByQuery() gin.HandlerFunc {
 			c.IndentedJSON(404, "Something Went Wrong while fetching Data")
 			return
 		}
+
+		//json->struct
 		err = searchQueryDB.All(ctx, &searchProducts)
 		if err != nil {
 			log.Println(err)
@@ -204,6 +223,7 @@ func SearchProductByQuery() gin.HandlerFunc {
 			return
 		}
 		defer searchQueryDB.Close(ctx)
+
 		if err := searchQueryDB.Err(); err != nil {
 			log.Println(err)
 			c.IndentedJSON(400, "Invalid Request")
