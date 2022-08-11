@@ -41,6 +41,19 @@ func VerifyPassword(userPassword string, givenPassword string) (bool, string) {
 	return valid, msg
 }
 
+func UserData(token string) *generate.SignedDetails {
+	var details *generate.SignedDetails
+	if token == "" {
+		println("No Token")
+		return details
+	}
+	claims, err := generate.ValidateToken(token)
+	if err != "" {
+		println("Cannot Validate Token")
+	}
+	return claims
+}
+
 func Signup() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
@@ -144,6 +157,14 @@ func Login() gin.HandlerFunc {
 		defer cancel()
 		generate.UpdateAllTokens(token, refreshToken, founduser.User_ID)
 		c.JSON(http.StatusFound, founduser)
+		//ok, claims := SignedIn(c.Request.Header.Get("token"))
+		//if ok {
+		//	println(claims)
+		//	println(claims.Uid)
+		//	println(claims.Email)
+		//	println(claims.First_Name)
+		//	println(claims.Last_Name)
+		//}
 	}
 }
 

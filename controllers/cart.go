@@ -33,7 +33,9 @@ func (app *Application) AddToCart() gin.HandlerFunc {
 			_ = c.AbortWithError(http.StatusBadRequest, errors.New("product id is empty"))
 			return
 		}
-		userQueryID := c.Query("userID")
+		user := UserData(c.Request.Header.Get("token"))
+		userQueryID := user.Uid
+		//userQueryID := c.Query("userID")
 		if userQueryID == "" {
 			log.Println("user id is empty")
 			_ = c.AbortWithError(http.StatusBadRequest, errors.New("user id is empty"))
