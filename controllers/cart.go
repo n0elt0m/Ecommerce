@@ -11,7 +11,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
 	"net/http"
-	"strconv"
 	"time"
 )
 
@@ -28,22 +27,25 @@ func NewApplication(prodCollection, userCollection *mongo.Collection) *Applicati
 }
 func (app *Application) AddToCart() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		type cartAdd struct {
-			id       string
-			quantity string
-		}
-		var add cartAdd
-		if err := c.BindJSON(&add); err != nil {
-			println("Error Json Binding")
-			c.IndentedJSON(http.StatusNotAcceptable, err.Error())
-		}
-		//println(add)
-		println(add.id)
-		println(add.quantity)
-		//productQueryID := c.Query("id")
-		productQueryID := add.id
+		//type cartAdd struct {
+		//	id       string
+		//	quantity string
+		//}
+		//var add cartAdd
+		//
+		//if err := c.BindJSON(&add); err != nil {
+		//	println("Error Json Binding")
+		//	c.IndentedJSON(http.StatusNotAcceptable, err.Error())
+		//}
+		//fmt.Printf("%v", add)
+		//println(add.id)
+		//println(add.quantity)
+
+		productQueryID := c.Query("id")
+
+		//productQueryID := add.id
 		if productQueryID == "" {
-			log.Println("product id is empty")
+			log.Println("product id is empty!!!!!")
 			_ = c.AbortWithError(http.StatusBadRequest, errors.New("product id is empty"))
 			return
 		}
@@ -64,19 +66,19 @@ func (app *Application) AddToCart() gin.HandlerFunc {
 
 		var ctx, cancel = context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
-		j, _ := strconv.Atoi(add.quantity)
-
-		for i := 0; i < j; i++ {
-			err = database.AddProductToCart(ctx, app.prodCollection, app.userCollection, productID, userQueryID)
-			if err != nil {
-				c.IndentedJSON(http.StatusInternalServerError, err)
-			}
-		}
-
-		//err = database.AddProductToCart(ctx, app.prodCollection, app.userCollection, productID, userQueryID)
-		//if err != nil {
-		//	c.IndentedJSON(http.StatusInternalServerError, err)
+		//j, _ := strconv.Atoi(add.quantity)
+		//
+		//for i := 0; i < j; i++ {
+		//	err = database.AddProductToCart(ctx, app.prodCollection, app.userCollection, productID, userQueryID)
+		//	if err != nil {
+		//		c.IndentedJSON(http.StatusInternalServerError, err)
+		//	}
 		//}
+
+		err = database.AddProductToCart(ctx, app.prodCollection, app.userCollection, productID, userQueryID)
+		if err != nil {
+			c.IndentedJSON(http.StatusInternalServerError, err)
+		}
 		c.IndentedJSON(200, "Successfully Added to the cart")
 	}
 }

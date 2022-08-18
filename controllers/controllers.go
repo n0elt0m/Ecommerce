@@ -168,6 +168,65 @@ func Login() gin.HandlerFunc {
 	}
 }
 
+func AdminLogin() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		defer cancel()
+
+		var user models.User
+
+		var founduser models.User
+
+		if err := c.BindJSON(&user); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err})
+			return
+		}
+
+		//DB Search
+		err := UserCollection.FindOne(ctx, bson.M{"email": user.Email}).Decode(&founduser)
+		defer cancel()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "login or password incorrect"})
+			return
+		}
+		PasswordIsValid, msg := VerifyPassword(*user.Password, *founduser.Password)
+		defer cancel()
+		if !PasswordIsValid {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": msg})
+			fmt.Println(msg)
+			return
+		}
+
+		//jwt
+		token, refreshToken, _ := generate.TokenGenerator(*founduser.Email, *founduser.First_Name, *founduser.Last_Name, founduser.User_ID)
+		defer cancel()
+		generate.UpdateAllTokens(token, refreshToken, founduser.User_ID)
+		//c.JSON(http.StatusFound, founduser)
+
+		//
+		var userList []models.User
+		cursor, err := UserCollection.Find(ctx, bson.D{{}})
+		if err != nil {
+			c.IndentedJSON(http.StatusInternalServerError, "Something went wrong please try after some time")
+			return
+		}
+		err = cursor.All(ctx, &userList)
+		if err != nil {
+			log.Println(err)
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+		defer cursor.Close(ctx)
+		if err := cursor.Err(); err != nil {
+			log.Println(err)
+			c.IndentedJSON(400, "Invalid")
+			return
+		}
+		defer cancel()
+		c.IndentedJSON(200, userList)
+	}
+}
+
 func ProductViewerAdmin() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)

@@ -24,12 +24,12 @@ func main() {
 	router.Use(middleware.Authentication())
 
 	router.POST("/addtocart", app.AddToCart())
-	router.GET("/removeitem", app.RemoveItem())
+	router.DELETE("/removeitem", app.RemoveItem())
 	router.GET("/listcart", controllers.GetItemFromCart())
 	router.POST("/addaddress", controllers.AddAddress())
 	router.PUT("/edithomeaddress", controllers.EditHomeAddress())
 	router.PUT("/editworkaddress", controllers.EditWrorkAddress())
-	router.GET("/deleteaddresses", controllers.DeleteAddress())
+	router.DELETE("/deleteaddresses", controllers.DeleteAddress())
 	router.GET("/cartcheckout", app.BuyFromCart())
 	router.GET("/instantbuy", app.InstantBuy())
 
