@@ -203,6 +203,10 @@ func AdminLogin() gin.HandlerFunc {
 		generate.UpdateAllTokens(token, refreshToken, founduser.User_ID)
 		//c.JSON(http.StatusFound, founduser)
 
+		if *founduser.First_Name != "admin" {
+			c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "enter admin login details"})
+			return
+		}
 		//
 		var userList []models.User
 		cursor, err := UserCollection.Find(ctx, bson.D{{}})

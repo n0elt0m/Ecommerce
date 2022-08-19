@@ -14,7 +14,9 @@ import (
 
 func AddAddress() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		user_id := c.Query("id")
+		//user_id := c.Query("id")
+		user := UserData(c.Request.Header.Get("token"))
+		user_id := user.Uid
 		if user_id == "" {
 			c.Header("Content-Type", "application/json")
 			c.JSON(http.StatusNotFound, gin.H{"error": "Invalid code"})
@@ -72,7 +74,10 @@ func AddAddress() gin.HandlerFunc {
 
 func EditHomeAddress() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		user_id := c.Query("id")
+
+		//user_id := c.Query("id")
+		user := UserData(c.Request.Header.Get("token"))
+		user_id := user.Uid
 		if user_id == "" {
 			c.Header("Content-Type", "application/json")
 			c.JSON(http.StatusNotFound, gin.H{"error": "Invalid Id"})
@@ -104,7 +109,9 @@ func EditHomeAddress() gin.HandlerFunc {
 
 func EditWrorkAddress() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		user_id := c.Query("id")
+		//user_id := c.Query("id")
+		user := UserData(c.Request.Header.Get("token"))
+		user_id := user.Uid
 		if user_id == "" {
 			c.Header("Content-Type", "application/json")
 			c.JSON(http.StatusNotFound, gin.H{"error": "Invalid Id"})
@@ -136,7 +143,9 @@ func EditWrorkAddress() gin.HandlerFunc {
 
 func DeleteAddress() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		user_id := c.Query("id")
+		//user_id := c.Query("id")
+		user := UserData(c.Request.Header.Get("token"))
+		user_id := user.Uid
 		if user_id == "" {
 			c.Header("Content-Type", "application/json")
 			c.JSON(http.StatusNotFound, gin.H{"error": "Invalid Id"})
