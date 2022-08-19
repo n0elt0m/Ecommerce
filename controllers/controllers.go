@@ -7,6 +7,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/noel/ecommerce/database"
 	generate "github.com/noel/ecommerce/tokens"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"strconv"
 
 	"github.com/noel/ecommerce/models"
@@ -371,6 +372,74 @@ func RatingFilter() gin.HandlerFunc {
 		defer cancel()
 		min, _ := strconv.Atoi(queryParam)
 		searchQueryDB, err := ProductCollection.Find(ctx, bson.M{"rating": bson.M{"$gt": min}})
+		if err != nil {
+			c.IndentedJSON(404, "Something Went Wrong while fetching Data")
+			return
+		}
+
+		//json->struct
+		err = searchQueryDB.All(ctx, &searchProducts)
+		if err != nil {
+			log.Println(err)
+			c.IndentedJSON(400, "Invalid Data")
+			return
+		}
+		defer searchQueryDB.Close(ctx)
+
+		if err := searchQueryDB.Err(); err != nil {
+			log.Println(err)
+			c.IndentedJSON(400, "Invalid Request")
+			return
+		}
+		defer cancel()
+		c.IndentedJSON(200, searchProducts)
+	}
+}
+func DescendingSort() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var searchProducts []models.Product
+
+		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		defer cancel()
+
+		filter := bson.D{}
+		opts := options.Find().SetSort(bson.D{{"price", -1}})
+		searchQueryDB, err := ProductCollection.Find(ctx, filter, opts)
+
+		if err != nil {
+			c.IndentedJSON(404, "Something Went Wrong while fetching Data")
+			return
+		}
+
+		//json->struct
+		err = searchQueryDB.All(ctx, &searchProducts)
+		if err != nil {
+			log.Println(err)
+			c.IndentedJSON(400, "Invalid Data")
+			return
+		}
+		defer searchQueryDB.Close(ctx)
+
+		if err := searchQueryDB.Err(); err != nil {
+			log.Println(err)
+			c.IndentedJSON(400, "Invalid Request")
+			return
+		}
+		defer cancel()
+		c.IndentedJSON(200, searchProducts)
+	}
+}
+func AscendingSort() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var searchProducts []models.Product
+
+		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		defer cancel()
+
+		filter := bson.D{}
+		opts := options.Find().SetSort(bson.D{{"price", 1}})
+		searchQueryDB, err := ProductCollection.Find(ctx, filter, opts)
+
 		if err != nil {
 			c.IndentedJSON(404, "Something Went Wrong while fetching Data")
 			return

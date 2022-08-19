@@ -64,18 +64,18 @@ Response
     "image": "alienware.jpg"
   },
   {
-    "Product_ID": "616152679f29be942bd9df8f",
-    "product_name": "ginger ale",
-    "price": 900,
-    "rating": 5,
-    "image": "gin.jpg"
+    "Product_ID": "62ff74ea6cb5eec189778db3",
+    "product_name": "razor Blade",
+    "price": 4500,
+    "rating": 7,
+    "image": "razor.jpg"
   },
   {
-    "Product_ID": "616152ee9f29be942bd9df90",
-    "product_name": "iphone 13",
-    "price": 1700,
+    "Product_ID": "62ff75806cb5eec189778db4",
+    "product_name": "M1 Mac",
+    "price": 6500,
     "rating": 4,
-    "image": "iphone.jpg"
+    "image": "mac.jpg"
   },
   {
     "Product_ID": "616152fa9f29be942bd9df91",

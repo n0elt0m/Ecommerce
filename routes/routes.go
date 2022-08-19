@@ -15,4 +15,7 @@ func UserRoutes(incomingRoutes *gin.Engine) {
 	incomingRoutes.GET("/users/productminrate", controllers.MinRateFilter())
 	incomingRoutes.GET("/users/productmaxrate", controllers.MaxRateFilter())
 	incomingRoutes.GET("/users/productrating", controllers.RatingFilter())
+	incomingRoutes.GET("/users/productsortdescending", controllers.DescendingSort())
+	incomingRoutes.GET("/users/productsortascending", controllers.AscendingSort())
+
 }
