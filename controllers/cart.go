@@ -11,6 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -42,7 +43,11 @@ func (app *Application) AddToCart() gin.HandlerFunc {
 		//println(add.quantity)
 
 		productQueryID := c.Query("id")
-
+		quan := c.Query("quantity")
+		quantity, _ := strconv.Atoi(quan)
+		if quan == "" {
+			quantity = 1
+		}
 		//productQueryID := add.id
 		if productQueryID == "" {
 			log.Println("product id is empty!!!!!")
@@ -68,17 +73,17 @@ func (app *Application) AddToCart() gin.HandlerFunc {
 		defer cancel()
 		//j, _ := strconv.Atoi(add.quantity)
 		//
-		//for i := 0; i < j; i++ {
-		//	err = database.AddProductToCart(ctx, app.prodCollection, app.userCollection, productID, userQueryID)
-		//	if err != nil {
-		//		c.IndentedJSON(http.StatusInternalServerError, err)
-		//	}
-		//}
-
-		err = database.AddProductToCart(ctx, app.prodCollection, app.userCollection, productID, userQueryID)
-		if err != nil {
-			c.IndentedJSON(http.StatusInternalServerError, err)
+		for i := 0; i < quantity; i++ {
+			err = database.AddProductToCart(ctx, app.prodCollection, app.userCollection, productID, userQueryID)
+			if err != nil {
+				c.IndentedJSON(http.StatusInternalServerError, err)
+			}
 		}
+
+		//err = database.AddProductToCart(ctx, app.prodCollection, app.userCollection, productID, userQueryID)
+		//if err != nil {
+		//	c.IndentedJSON(http.StatusInternalServerError, err)
+		//}
 		c.IndentedJSON(200, "Successfully Added to the cart")
 	}
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/noel/ecommerce/database"
 	generate "github.com/noel/ecommerce/tokens"
+	"strconv"
 
 	"github.com/noel/ecommerce/models"
 	"go.mongodb.org/mongo-driver/bson"
@@ -276,6 +277,121 @@ func SearchProduct() gin.HandlerFunc {
 		}
 		defer cancel()
 		c.IndentedJSON(200, productList)
+	}
+}
+
+func MinRateFilter() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var searchProducts []models.Product
+		queryParam := c.Query("min")
+		if queryParam == "" {
+			log.Println("query is empty")
+			c.Header("Content-Type", "application/json")
+			c.JSON(http.StatusNotFound, gin.H{"error": "Invalid Search"})
+			c.Abort()
+			return
+		}
+		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		defer cancel()
+		min, _ := strconv.Atoi(queryParam)
+		searchQueryDB, err := ProductCollection.Find(ctx, bson.M{"price": bson.M{"$gt": min}})
+		if err != nil {
+			c.IndentedJSON(404, "Something Went Wrong while fetching Data")
+			return
+		}
+
+		//json->struct
+		err = searchQueryDB.All(ctx, &searchProducts)
+		if err != nil {
+			log.Println(err)
+			c.IndentedJSON(400, "Invalid Data")
+			return
+		}
+		defer searchQueryDB.Close(ctx)
+
+		if err := searchQueryDB.Err(); err != nil {
+			log.Println(err)
+			c.IndentedJSON(400, "Invalid Request")
+			return
+		}
+		defer cancel()
+		c.IndentedJSON(200, searchProducts)
+	}
+}
+func MaxRateFilter() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var searchProducts []models.Product
+		queryParam := c.Query("max")
+		if queryParam == "" {
+			log.Println("query is empty")
+			c.Header("Content-Type", "application/json")
+			c.JSON(http.StatusNotFound, gin.H{"error": "Invalid Search"})
+			c.Abort()
+			return
+		}
+		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		defer cancel()
+		max, _ := strconv.Atoi(queryParam)
+		searchQueryDB, err := ProductCollection.Find(ctx, bson.M{"price": bson.M{"$lt": max}})
+		if err != nil {
+			c.IndentedJSON(404, "Something Went Wrong while fetching Data")
+			return
+		}
+
+		//json->struct
+		err = searchQueryDB.All(ctx, &searchProducts)
+		if err != nil {
+			log.Println(err)
+			c.IndentedJSON(400, "Invalid Data")
+			return
+		}
+		defer searchQueryDB.Close(ctx)
+
+		if err := searchQueryDB.Err(); err != nil {
+			log.Println(err)
+			c.IndentedJSON(400, "Invalid Request")
+			return
+		}
+		defer cancel()
+		c.IndentedJSON(200, searchProducts)
+	}
+}
+func RatingFilter() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var searchProducts []models.Product
+		queryParam := c.Query("min")
+		if queryParam == "" {
+			log.Println("query is empty")
+			c.Header("Content-Type", "application/json")
+			c.JSON(http.StatusNotFound, gin.H{"error": "Invalid Search"})
+			c.Abort()
+			return
+		}
+		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		defer cancel()
+		min, _ := strconv.Atoi(queryParam)
+		searchQueryDB, err := ProductCollection.Find(ctx, bson.M{"rating": bson.M{"$gt": min}})
+		if err != nil {
+			c.IndentedJSON(404, "Something Went Wrong while fetching Data")
+			return
+		}
+
+		//json->struct
+		err = searchQueryDB.All(ctx, &searchProducts)
+		if err != nil {
+			log.Println(err)
+			c.IndentedJSON(400, "Invalid Data")
+			return
+		}
+		defer searchQueryDB.Close(ctx)
+
+		if err := searchQueryDB.Err(); err != nil {
+			log.Println(err)
+			c.IndentedJSON(400, "Invalid Request")
+			return
+		}
+		defer cancel()
+		c.IndentedJSON(200, searchProducts)
 	}
 }
 
