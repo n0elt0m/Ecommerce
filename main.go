@@ -2,15 +2,22 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"github.com/noel/ecommerce/controllers"
 	"github.com/noel/ecommerce/database"
 	"github.com/noel/ecommerce/middleware"
 	"github.com/noel/ecommerce/routes"
 	"log"
+
 	"os"
 )
 
 func main() {
+	err := godotenv.Load(".env")
+
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "9000"
