@@ -10,6 +10,7 @@ func UserRoutes(incomingRoutes *gin.Engine) {
 	incomingRoutes.POST("/users/login", controllers.Login())
 	incomingRoutes.POST("/admin/login", controllers.AdminLogin())
 	incomingRoutes.POST("/admin/addproduct", controllers.ProductViewerAdmin())
+	incomingRoutes.DELETE("/admin/deleteuser", controllers.AdminDeleteUser())
 	incomingRoutes.GET("/users/productview", controllers.SearchProduct())
 	incomingRoutes.GET("/users/search", controllers.SearchProductByQuery())
 	incomingRoutes.GET("/users/productminrate", controllers.MinRateFilter())

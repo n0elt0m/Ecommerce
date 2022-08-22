@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -252,6 +253,42 @@ func ProductViewerAdmin() gin.HandlerFunc {
 		c.JSON(http.StatusOK, "Successfully added our Product !!Admin!!")
 	}
 }
+func AdminDeleteUser() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		userQueryID := c.Query("id")
+		if userQueryID == "" {
+			log.Println("user id is empty")
+
+			_ = c.AbortWithError(http.StatusBadRequest, errors.New("user id is empty"))
+			return
+		}
+		admin := UserData(c.Request.Header.Get("token"))
+		adminID := admin.Uid
+		if adminID == "" || admin.First_Name != "admin" {
+			log.Println("login as admin")
+			_ = c.AbortWithError(http.StatusBadRequest, errors.New("login as admin"))
+			return
+		}
+		var userCollection *mongo.Collection = database.UserData(database.Client, "Users")
+		userID, err := primitive.ObjectIDFromHex(userQueryID)
+		if err != nil {
+			log.Println(err)
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+		var ctx, cancel = context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		filter := bson.D{primitive.E{Key: "_id", Value: userID}}
+		_, err = userCollection.DeleteMany(ctx, filter)
+		if err != nil {
+			c.IndentedJSON(http.StatusInternalServerError, err)
+			println("cannot delete User")
+			return
+		}
+		c.IndentedJSON(200, "User Removed")
+	}
+}
+
 func SearchProduct() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var productList []models.Product
