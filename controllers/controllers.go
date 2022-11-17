@@ -115,7 +115,7 @@ func Signup() gin.HandlerFunc {
 		user.Address_Details = make([]models.Address, 0)
 		user.Order_Status = make([]models.Order, 0)
 
-		//DB adding
+		//DB addin
 		_, inserterr := UserCollection.InsertOne(ctx, user)
 		if inserterr != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "The user was not created"})
